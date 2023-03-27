@@ -11,7 +11,6 @@ type: "ruby:2.7"
 
 dependencies:
     nodejs:
-        n: "*"
         yarn: "*"
 
 # The relationships of the application with services or other applications.
@@ -102,7 +101,7 @@ hooks:
     deploy: | 
         bundle exec rails db:migrate
     post_deploy: |
-        export URL==$(echo $PLATFORM_ROUTES | base64 --decode | jq -r 'to_entries[] | select(.value.primary == true) | .key')
+        export URL=$(echo $PLATFORM_ROUTES | base64 --decode | jq -r 'to_entries[] | select(.value.primary == true) | .key')
         export TIMESTAMP=$(stat -c %y .global)
         livecycle link --api-key="S__Yks7n.fruweGrpRLI0fZZQcw3O_DjRFJm87xoe" --url=$URL --ref=$PLATFORM_BRANCH --revision=$PLATFORM_TREE_ID  --revision--revision-timestamp=$TIMESTAMP 
 # The configuration of the application when running.
