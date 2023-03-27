@@ -12,6 +12,7 @@ type: "ruby:2.7"
 dependencies:
     nodejs:
         yarn: "*"
+        "@livecycle/cli": "*"
 
 # The relationships of the application with services or other applications.
 #
@@ -96,8 +97,12 @@ hooks:
         SECRET_KEY_BASE=1 bundle exec rails assets:precompile
         rsync -az --delete $RAILS_TMP/cache/webpacker/ "$PLATFORM_CACHE_DIR/webpacker/"
     # The deploy hook runs after your application has been deployed and started.
-    deploy: |
+    deploy: | 
         bundle exec rails db:migrate
+    post_deploy: |
+        export URL==$(echo $PLATFORM_ROUTES | base64 --decode | jq -r 'to_entries[] | select(.value.primary == true) | .key')
+        export TIMESTAMP=$(stat -c %y .global)
+        livecycle link --api-key="S__Yks7n.fruweGrpRLI0fZZQcw3O_DjRFJm87xoe" --url=$URL --ref=$PLATFORM_BRANCH --revision=$PLATFORM_TREE_ID  --revision--revision-timestamp=$TIMESTAMP 
 # The configuration of the application when running.
 web:
     upstream:
