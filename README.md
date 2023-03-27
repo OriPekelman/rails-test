@@ -1,4 +1,5 @@
 # Ruby on Rails for Platform.sh
+Test
 
 <p align="center">
 <a href="https://console.platform.sh/projects/create-project?template=https://raw.githubusercontent.com/platformsh/template-builder/master/templates/rails/.platform.template.yaml&utm_content=rails&utm_source=github&utm_medium=button&utm_campaign=deploy_on_platform">

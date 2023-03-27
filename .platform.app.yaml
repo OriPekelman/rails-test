@@ -41,6 +41,7 @@ variables:
         RAILS_ENV: 'production'
         RAILS_LOG_TO_STDOUT: '1'
         RAILS_TMP: '/tmp'
+        N_PREFIX: /app/.global
 
 # The 'mounts' describe writable, persistent filesystem mounts in the application.
 mounts:
@@ -53,6 +54,9 @@ mounts:
     "/tmp":
         source: local
         source_path: tmp
+    "/.cache":
+        source: local
+        source_path: cache
 
 # The hooks executed at various points in the lifecycle of the application.
 hooks:
@@ -95,9 +99,16 @@ hooks:
         # We dont need secret here https://github.com/rails/rails/issues/32947
         SECRET_KEY_BASE=1 bundle exec rails assets:precompile
         rsync -az --delete $RAILS_TMP/cache/webpacker/ "$PLATFORM_CACHE_DIR/webpacker/"
+        npm install -g @livecycle/cli
     # The deploy hook runs after your application has been deployed and started.
-    deploy: |
+    deploy: | 
         bundle exec rails db:migrate
+    post_deploy: |
+        unset NPM_CONFIG_PREFIX
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        export URL=$(echo $PLATFORM_ROUTES | base64 --decode | jq -r 'to_entries[] | select(.value.primary == true) | .key')
+        export TIMESTAMP=$(stat -c %y .global)
+        livecycle link --api-key="S__Yks7n.fruweGrpRLI0fZZQcw3O_DjRFJm87xoe" --url=$URL --ref=$PLATFORM_BRANCH --revision=$PLATFORM_TREE_ID  --revision--revision-timestamp=$TIMESTAMP 
 # The configuration of the application when running.
 web:
     upstream:
