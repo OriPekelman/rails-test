@@ -54,6 +54,9 @@ mounts:
     "/tmp":
         source: local
         source_path: tmp
+    "/.cache":
+        source: local
+        source_path: cache
 
 # The hooks executed at various points in the lifecycle of the application.
 hooks:
@@ -101,6 +104,8 @@ hooks:
     deploy: | 
         bundle exec rails db:migrate
     post_deploy: |
+        unset NPM_CONFIG_PREFIX
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
         export URL=$(echo $PLATFORM_ROUTES | base64 --decode | jq -r 'to_entries[] | select(.value.primary == true) | .key')
         export TIMESTAMP=$(stat -c %y .global)
         livecycle link --api-key="S__Yks7n.fruweGrpRLI0fZZQcw3O_DjRFJm87xoe" --url=$URL --ref=$PLATFORM_BRANCH --revision=$PLATFORM_TREE_ID  --revision--revision-timestamp=$TIMESTAMP 
